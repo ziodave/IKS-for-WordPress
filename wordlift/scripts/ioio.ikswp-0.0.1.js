@@ -20,7 +20,9 @@
 	 * @property
 	 */
 	$.ioio.ikswp.settings = {
-		proxy : '../wp-content/plugins/wordlift/utils/proxy/proxy.php'
+		proxy  : '../wp-content/plugins/wordlift/utils/proxy/proxy.php',
+		stanbol: 'http://ziodave.dyndns.org:8080/engines/',
+		entityhub: 'http://ziodave.dyndns.org:8080/entityhub/sites/entity?id=' 
 	}
 
 	/**
@@ -150,7 +152,7 @@
 						},
 						url : $.ioio.ikswp.settings.proxy,
 						data : {
-							proxy_url : "http://localhost:10088/enel/rdfa/sample_stanbol.rdf",
+							proxy_url : $.ioio.ikswp.settings.stanbol,
 							/*
 							 * the following option is available:
 							 * "http://localhost:8080/engines/",
@@ -280,7 +282,7 @@
 						},
 						url : $.ioio.ikswp.settings.proxy,
 						data : {
-							proxy_url : "http://localhost:8080/entityhub/sites/entity?id="
+							proxy_url : $.ioio.ikswp.settings.entityhub
 									+ reference,
 							verb : "GET",
 							format : "application/rdf+xml"
