@@ -1,0 +1,33 @@
+.iks-ent_sel-highl_finished {
+	border-style: none;
+	font-style: italic;
+	background: #d8d3d0; /* grey */
+}
+
+.iks-ent_sel-highl_one {
+	border-style: none;
+	font-style: italic;
+	background: #c4ffd3; /* green */
+	cursor: pointer;
+}
+
+.iks-ent_sel-highl_many {
+	border-style: none;
+	font-style: italic;
+	background: #ffdb9e; /* orange */
+	cursor: pointer;
+}
+
+.iks-ent_sel-dia {
+	width: 320px;
+	font-family: Optima, "Trebuchet MS", sans-serif;
+	font-size: 14px;
+}
+.iks-ent_sel-rdfa_view {
+	margin-left:2px;
+	background-image: url(../images/icon_more_10x10.gif);
+	background-repeat: no-repeat;
+	background-position: center center;
+	background-color: transparent;
+	cursor: help;
+}

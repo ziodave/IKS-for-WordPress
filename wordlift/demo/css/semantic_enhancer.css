@@ -1,0 +1,28 @@
+.iks-sem_enh-highlightable {
+	-webkit-border-radius: 0.5em;
+	-moz-border-radius: 0.5em;
+}
+
+.iks-sem_enh-highlighted {
+	background-color: #B6D8EE;
+	-webkit-border-radius: 0.5em;
+	-moz-border-radius: 0.5em;
+}
+
+.iks-sem_enh-dia {
+	font-family: "Palatino", "Trebuchet MS", "Times new roman", serif;
+	font-size: 12px;
+	position: absolute;
+	display: block;
+}
+
+.iks-sem_enh-load {
+	background-repeat: no-repeat;
+	background-position: center center;
+	background-color: #cecbc4;
+	filter:alpha(opacity=50);
+	-moz-opacity:0.5;
+	-khtml-opacity: 0.5;
+	opacity: 0.5;
+	cursor: wait;
+}

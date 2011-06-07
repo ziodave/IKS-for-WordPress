@@ -1,0 +1,425 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.0//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd">
+<html
+    version="XHTML+RDFa 1.0"
+    xml:lang="en"
+	xmlns:foaf = "http://xmlns.com/foaf/0.1/"
+    xmlnsrdfcal = "http://www.w3.org/2002/12/cal#",
+	xmlns:dbpedia = "http://dbpedia.org/resource/"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+    xmlns:demo="http://this.demo.eu/">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Insert title here</title>
+
+<style>
+body {
+	font-family: Helvetica;
+}
+
+#content {
+	font-size: 20pt;
+}
+
+#spinner {
+	float: right;
+	display: none;
+}
+
+#spinner img {
+	width: 16px;
+	height: 16px;
+}
+
+#alt_content {
+	display: none;
+}
+
+.content_view {
+	border: 1px solid gray;
+	margin: 1px;
+	overflow: auto;
+}
+
+.content_view #name {
+	font-weight: bold;
+}
+
+.content_view #photo {
+	float: left;
+	margin: 2px;
+}
+
+.content_view #photo img {
+	width: 100px;
+}
+</style>
+
+<script type="text/javascript" src="js/jquery-1.5.2.min.js"></script>
+<script type="text/javascript" src="js/jquery-ui-1.8.12.custom.min.js"></script>
+<script type="text/javascript" src="js/jquery.rdfquery.rules.js"></script>
+<script type="text/javascript" src="js/underscore.js"></script>
+<script type="text/javascript" src="js/backbone.js"></script>
+<script type="text/javascript" src="js/vie.js"></script>
+<script type="text/javascript" src="js/vie2-latest.js"></script>
+
+<script type="text/javascript" src="js/connector/stanbol.js"></script>
+<script type="text/javascript" src="js/connector/dbpedia.js"></script>
+<script type="text/javascript" src="js/connector/rdfa.js"></script>
+
+<script type="text/javascript" src="js/mapping/person.js"></script>
+
+<script type="text/javascript"
+	src="http://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.js"></script>
+
+<script type="text/x-jquery-tmpl" id="content_view_template">
+
+<div class="content_view">
+	<div id="photo"><img src="${photo}"/></div>
+	<div id="name">${name}</div>
+	<ul id="title">
+		{{each title}}<li>${$value}</li>{{/each}}
+	</ul>
+	<ul id="url">
+		{{each url}}<li>${$value}</li>{{/each}}
+	</ul>
+
+<!--
+	<ul id="affiliations">
+		{{each affiliation}}
+			<li>${$value}</li>
+		{{/each}}
+	</ul>
+ -->
+
+</div>
+
+</script>
+
+<script type="text/javascript">
+	ContentCollectionView = Backbone.View
+			.extend({
+				initialize : function() {
+					var that = this;
+					this._contentViews = [];
+
+					for ( var i = 0; i < this.collection.length; i++) {
+						console
+								.log(
+										'[ContentCollectionView.initialize] adding content [%d], id [%s]',
+										i, this.collection[i].id);
+						that._contentViews.push(new ContentView({
+							model : this.collection[i],
+							el : $('<div></div>')
+						}));
+					}
+
+					this.render();
+				},
+				render : function() {
+					var that = this;
+
+					$(this.el).empty();
+
+					_(this._contentViews).each(function(view) {
+						//try {
+							$(that.el).append(view.render().el);
+						//} catch (ex) {
+						//	console.log('could not render this element [%s]',ex);
+						//}
+
+					});
+				}
+			});
+</script>
+<script type="text/javascript">
+	ContentView = Backbone.View.extend({
+		initialize : function() {
+			this.render();
+		},
+		render : function() {
+			try
+			{
+			this.el.html($('#content_view_template').tmpl(
+					this.model.get('properties')));
+			} catch (ex) {
+				console.log('an exception occurred [%s]',ex.message);
+			}
+			/*
+			var template = _.template($('#content_view_template').html(),
+					this.model.get('properties'));
+			this.el.html(template);
+			 */
+			return (this);
+		}
+	});
+</script>
+<script type="text/javascript">
+	Content = Backbone.Model
+			.extend({
+				defaults : {
+					is_enhancement : false,
+					properties : null
+				},
+				initialize : function() {
+
+					// initialize the properties instance
+					this.set({
+						is_enhancement : false,
+						properties : {}
+					});
+
+					var triples = this.get('rdf_data').databank.subjectIndex[this
+							.get('subject')];
+
+					for ( var i = 0; i < triples.length; i++) {
+						var triple = triples[i];
+						var property = triple.property.value.toString();
+						var object = triple.object.value.toString();
+
+						// it's an IKS Enhancement Context
+						if (property === "http://fise.iks-project.eu/ontology/hasEnhancementContext") {
+							console
+									.log('[Content.initialize] found an enhancement');
+							this.set({
+								is_enhancement : true
+							});
+							continue;
+						}
+
+						// it's a type
+						if (property === "http://www.w3.org/1999/02/22-rdf-syntax-ns#type") {
+							var uri = this.uriAndFragment(object);
+							this.set({
+								type : uri[1],
+								namespace : uri[0]
+							});
+
+							continue;
+						}
+
+						// it's a property
+						if (property.substring(0, 30) === "http://rdf.data-vocabulary.org") {
+
+							var name = this.uriAndFragment(property)[1];
+							var p = this.get('properties');
+
+							if (object[0] === '"'
+									&& object[object.length - 1] === '"')
+								object = object.substring(1, object.length - 1);
+
+							if ( object.substring(0, 19) === 'http://dbpedia.org/' ) continue;
+
+							//if (p[name])
+							//	p[name].push(object);
+							//else
+								p[name] = [ object ];
+
+							this.set({
+								properties : p
+							});
+
+							continue;
+						}
+					}
+				},
+				uriAndFragment : function(object) {
+					var uri = $.uri(object);
+					var type = object;
+					var namespace = '';
+					if (uri.fragment) {
+						type = uri.fragment;
+						namespace = object.substring(0, object.length
+								- type.length)
+					}
+					return [ namespace, type ];
+				},
+				dumpProperties : function() {
+					console.log('[Content.dumpProperties] type [%s]',this.get('type'));
+					var p = this.get('properties');
+					for (key in p) {
+						console.log('[Content.dumpProperties] [%s][%s]', key,
+								p[key].join(','));
+					}
+				}
+			});
+</script>
+<script type="text/javascript">
+	ContentCollection = Backbone.Collection.extend({
+		model : Content,
+		enhancements : function() {
+			return this.filter(function(item) {
+				return item.get('is_enhancement');
+			});
+		},
+		loadRdf : function(data) {
+			console.log('[ContentCollection.loadRdf] data [%s]', data);
+
+			try {
+				this.rdf_data = $.rdf().load(data, {});
+			} catch (ex) {
+				alert('Sorry, an error occurred:\n' + ex.message);
+				return;
+			}
+
+			for (subject in this.rdf_data.databank.subjectIndex)
+				this.add(new Content({
+					id : this.length,
+					subject : subject,
+					rdf_data : this.rdf_data
+				}));
+
+			console.log('There are [%d] contents and [%d] enhancements',
+					this.length, this.enhancements().length);
+
+			var e = this.enhancements();
+			for ( var i = 0; i < e.length; i++) {
+				console.log('********* enhancement [%d] *********', i);
+				e[i].dumpProperties();
+			}
+
+			new ContentCollectionView({
+				el : $('#content_collection_view'),
+				collection : this.enhancements()
+			});
+
+		}
+	});
+</script>
+<script type="text/javascript">
+	Enhancer = Backbone.Model.extend({
+		defaults : {
+			stanbol_url : 'http://wit.istc.cnr.it:9090/engines/',
+			proxy : '../utils/proxy/proxy.php',
+			spinner : null
+		},
+		initialize : function() {
+		},
+		enhance : function(source, destination) {
+			var that = this; // save a reference to this
+
+			// show spinner
+			if (this.get('spinner'))
+				this.get('spinner').show();
+
+			console.log('[Enhancer.enhance] using proxy [%s] and url [%s]',
+					this.get('proxy'), this.get('stanbol_url'));
+			$.ajax({
+				async : true,
+				success : function(data) {
+
+					console.log(data);
+
+					// hide the spinner
+					if (that.get('spinner'))
+						that.get('spinner').hide();
+
+					that.parse(data);
+
+				},
+				error : function() {
+
+					// hide the spinner
+					if (that.get('spinner'))
+						that.get('spinner').hide();
+
+					alert('An error occurred, sorry!');
+
+				},
+				type : 'POST',
+				url : this.get('proxy'),
+				data : {
+					proxy_url : this.get('stanbol_url'),
+					content : source.html(),
+					verb : 'POST',
+					format : 'application/rdf+json'
+				}
+			});
+		},
+		parse : function(data) {
+			console.log('[Enhancer.parse]');
+
+			var contents = new ContentCollection();
+			contents.loadRdf(data);
+
+		}
+	});
+</script>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+
+		VIE2.logLevels = [];
+
+		VIE2.connectors['stanbol'].options({
+	    	"proxy_url" : "../utils/proxy/proxy.php",
+	    	"enhancer_url" : "http://localhost:8080/engines/",
+	    	"entityhub_url" : "http://localhost:8080/entityhub/"
+		});
+        VIE2.connectors['dbpedia'].options({
+            "proxy_url" : "../utils/proxy/proxy.php"
+        });
+
+        VIE2.mappings['person']['collection'].bind("add", function (entity, collection) {
+        	console.log('*********************** person [%s]',entity);
+
+            if (collection === VIE2.mappings['person']['collection']) {
+
+                // new PersonView({id: 'person-' + (UUID++), model: entity});
+            }
+        });
+		var elem = $('#content');
+		elem
+		.vie2()
+		.vie2('analyze', function(data){console.log(data)});
+		return;
+
+		var e = new Enhancer({
+			stanbol_url: 'http://localhost:8080/engines/',
+			spinner : $('#spinner')
+		});
+		e.enhance($('#content'), $('#output'));
+
+	});
+</script>
+
+</head>
+<body>
+
+<div id="spinner"><img src="../images/spinner.gif" /></div>
+
+<div id="output"></div>
+
+<div id="content">Albert Einstein loves the songs by the person
+Bob Marley. He was married with Rita Anderson. George W. Bush was a
+great scientist. Paolo Scaroni and Fulvio Conti know each other.</div>
+
+<div id="alt_content">
+Obama offers best wishes to Israel on its 63rd Independence Day<br/>
+U.S. President sends holiday greetings as he prepares to engage in new round of Mideast diplomacy with upcoming meetings with Prime Minister Netanyahu and Jordanian King Abdullah.
+</div>
+
+<div id="alt_content">
+Enel is Italy's largest power company, and Europe's second listed utility by installed capacity. It is an integrated player which produces, distributes and sells electricity and gas.
+After having completed its international expansion, Enel is now actively engaged in consolidating the acquired assets and further integrating its businesses.
+The Enel Group has a presence in 40 countries over 4 continents, has over 97,000 MW of net installed capacity and sells power and gas to more than 61 million customers.
+Listed on the Milan stock exchange since 1999, Enel is the Italian company with the highest number of shareholders, some 1.5 million retail and institutional investors in 2010.
+Enel is also the second-largest Italian operator in the natural gas market, with approximately 2.9 million customers.
+</div>
+
+<div id="content_collection_view"></div>
+
+<div id="alt_content">Hi-tech and innovation: the ENEL’s choice<br />
+CEO Fulvio Conti speaks during the first Italian Innovation Day<br />
+<br />
+Large companies and SMEs and the situation of Enel. CEO Fulvio Conti’s
+speech during the first Italian Innovation Day, an initiative organized
+by Why Matters to the World, a company founded by Fernando Napolitano
+which began with the long term activity of the Mind the Bridge
+Foundation promoting the innovation of Italian companies. Conti’s speech
+was published in English on the new Panorama Economy website, and
+directed towards the American market.<br />
+</div>
+
+</body>
+</html>
