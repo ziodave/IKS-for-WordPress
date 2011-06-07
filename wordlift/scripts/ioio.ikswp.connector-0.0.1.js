@@ -16,7 +16,7 @@
 				});
 
 		var dialogContent = $('#dialog #content').html(
-				tinyMCE.get('content').getContent());
+				tinyMCE.get('content').getContent({format: 'raw'}));
 
 		dialog.dialog('open');
 
@@ -24,7 +24,7 @@
 			// remove any existing entities
 			$('#content div.entity').remove();
 			$("#results").empty();
-			var c = $("#content").html().replace(new RegExp("\\n", "g"), '');
+			var c = $("#dialog #content").text().replace(new RegExp("\\n", "g"), '');
 			c = c.replace(new RegExp("\\t", "g"), ' ');
 			$.ioio.ikswp.connector.analyze(c);
 		});
