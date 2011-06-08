@@ -6,7 +6,7 @@
 	float: right;
 }
 
-#content {
+#dialog #content {
 	padding: 2px;
 	margin: 2px;
 	background: lightYellow;
@@ -14,7 +14,7 @@
 	display: none;
 }
 
-#content p {
+#dialog #content p {
 	font-size: 14pt;
 }
 
