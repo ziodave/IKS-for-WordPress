@@ -20,9 +20,9 @@
 	 * @property
 	 */
 	$.ioio.ikswp.settings = {
-		proxy  : '../wp-content/plugins/wordlift/utils/proxy/proxy.php',
-		stanbol: 'http://ziodave.dyndns.org:8080/engines/',
-		entityhub: 'http://ziodave.dyndns.org:8080/entityhub/sites/entity?id=' 
+		proxy : '../wp-content/plugins/wordlift/utils/proxy/proxy.php',
+		stanbol : 'http://ziodave.dyndns.org:8080/engines/',
+		entityhub : 'http://ziodave.dyndns.org:8080/entityhub/sites/entity?id='
 	}
 
 	/**
@@ -263,31 +263,26 @@
 		},
 		_load : function(reference) {
 			var entityAnnotation = this;
-			$
-					.ajax({
-						async : true,
-						type : "POST",
-						success : function(data) {
-							try {
-								entityAnnotation.rdf
-										.load(
-												data,
-												{
-													namespaces : $.ioio.ikswp.namespaces.prefixes
-												});
-							} catch (e) {
-								console.log('[entityAnnotation][_load] ' + e);
-							}
-							entityAnnotation.populate();
-						},
-						url : $.ioio.ikswp.settings.proxy,
-						data : {
-							proxy_url : $.ioio.ikswp.settings.entityhub
-									+ reference,
-							verb : "GET",
-							format : "application/rdf+xml"
-						}
-					});
+			$.ajax({
+				async : true,
+				type : "POST",
+				success : function(data) {
+					try {
+						entityAnnotation.rdf.load(data, {
+							namespaces : $.ioio.ikswp.namespaces.prefixes
+						});
+					} catch (e) {
+						console.log('[entityAnnotation][_load] ' + e);
+					}
+					entityAnnotation.populate();
+				},
+				url : $.ioio.ikswp.settings.proxy,
+				data : {
+					proxy_url : $.ioio.ikswp.settings.entityhub + reference,
+					verb : "GET",
+					format : "application/rdf+xml"
+				}
+			});
 		}
 	}
 
@@ -404,7 +399,16 @@
 						'?subject dbprop:currentTeam ?team',
 						'?subject google:affiliation ?team').add(
 						'?subject dbprop:caption ?caption',
-						'?subject google:role ?caption');
+						'?subject google:role ?caption').add(
+						'?subject dbpedia:orderInOffice ?office',
+						'?subject google:role ?office').add(
+						'?subject dbprop:office ?office',
+						'?subject google:affiliation ?office').add(
+						'?subject dbprop:occupation ?occupation',
+						'?subject google:role ?occupation').add(
+						'?subject dbprop:office ?office',
+						'?subject google:affiliation ?office');
+				;
 
 				// the properties for this snippet type
 				var properties = {

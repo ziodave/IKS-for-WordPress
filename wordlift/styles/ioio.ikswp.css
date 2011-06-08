@@ -11,15 +11,24 @@
 	margin: 2px;
 	background: lightYellow;
 	overflow: auto;
+	display: none;
 }
 
 #content p {
 	font-size: 14pt;
 }
 
-
 .content-option {
 	display: none;
+}
+
+#dialog #bar {
+	text-align: center;
+}
+
+#dialog #bar #save-button {
+	margin: 10px;
+	font-size: 2em;
 }
 
 .entity {
@@ -27,10 +36,12 @@
 	padding: 2px;
 	margin: 2px;
 	overflow: auto;
-	width: 220px;
+	width: 210px;
 	height: 120px;
 	float: left;
 	background: white;
+	border-radius: 8px;
+	text-align: center;
 }
 
 .entity .types {
