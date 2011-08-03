@@ -37,7 +37,7 @@ class http {
         /*
         Seconds to attempt socket connection before giving up.
         */
-        $this->connect_timeout = 30; 
+        $this->connect_timeout = 30000; 
         
         /*
         Seconds to wait for stream to do its thing and return.
@@ -50,7 +50,7 @@ class http {
         the communication worked. Point is, set this higher than anything you
         think you'll need. Either way you have to wait!
         */
-        $this->stream_timeout = 60;
+        $this->stream_timeout = 60000;
         
         /*
         Set the 'dir' property to the directory where you want to store the cached
@@ -119,11 +119,17 @@ class http {
             }
         }
         
+        
+        $this->log .= "receiving response<br />";
+        
         /*
         Get response header.
         */
         $this->header = fgets($fh, 1024);
         $this->status = substr($this->header,9,3);
+        
+        $this->log .= "response received<br />";
+        
         while ((trim($line = fgets($fh, 1024)) != "") && (!feof($fh))) {
             $this->header .= $line;
             if ($this->status=="401" and strpos($line,"WWW-Authenticate: Basic realm=\"")===0) {
@@ -140,6 +146,9 @@ class http {
             $this->body .= fgets($fh, 1024);
         }
         fclose($fh);
+        
+        $this->log .= "socket closed<br />";
+        
         if ($need_to_save) { $this->saveToCache(); }
         return $this->status;
     }
@@ -171,7 +180,7 @@ class http {
             return false;
         }
         
-        stream_set_timeout($sock, $this->stream_timeout);
+        stream_set_timeout($sock, $this->stream_timeout*1000);
         
         $this->headers["Host"] = $server.":".$port;
         
@@ -245,6 +254,8 @@ class http {
                 return false;
             }
         }
+        
+        $this->log .= "getFromUrl() finished<br />";
         
         return $sock;
     }

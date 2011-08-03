@@ -124,9 +124,10 @@ function wlp_register_settings() {
 	//  5. io.enhancement_context
 	//  6. io.rdf_vocabulary_content
 
+	wp_register_script('ba-debug','http://github.com/cowboy/javascript-debug/raw/v0.4/ba-debug.min.js');
 	wp_register_script('jquery-json', plugins_url('/scripts/jquery.json-2.2.js', __FILE__), array('jquery'), false, true);
 	wp_register_script('jquery-rdf-rules', plugins_url('/scripts/jquery.rdfquery.rules-1.0.js', __FILE__), array('jquery','jquery-json'), false, true);
-	wp_register_script('ioio-ikswp', plugins_url('/scripts/ioio.ikswp-0.0.1.js', __FILE__), array('jquery-rdf-rules','jquery-ui-core','jquery-ui-selectable'), false, true);
+	wp_register_script('ioio-ikswp', plugins_url('/scripts/ioio.ikswp-0.0.2.js', __FILE__), array('ba-debug','jquery-rdf-rules','jquery-ui-core','jquery-ui-selectable'), false, true);
 
 
 	// this script will load all the dependencies

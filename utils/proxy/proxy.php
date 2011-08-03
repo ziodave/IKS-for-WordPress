@@ -44,6 +44,8 @@ if (!$h = new http()) {
     exit();
 }
 
+$h->stream_timeout = 300;
+$h->connect_timeout = 600;
 $h->url = $proxy_url;
 $h->postvars = $_POST;
 $h->verb = $_REQUEST['verb'];
