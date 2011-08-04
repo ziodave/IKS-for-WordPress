@@ -21,8 +21,8 @@
 	 */
 	$.ioio.ikswp.settings = {
 		proxy : '../wp-content/plugins/wordlift/utils/proxy/proxy.php',
-		stanbol : 'http://ziodave.dyndns.org:8080/engines/',
-		entityhub : 'http://ziodave.dyndns.org:8080/entityhub/sites/entity?id='
+		stanbol : 'http://10.181.173.101/engines/',
+		entityhub : 'http://10.181.173.101/entityhub/sites/entity?id='
 	}
 
 	/**
@@ -129,8 +129,10 @@
 					debug.groupEnd();
 
 				},
-				error : function() {
-					console.log('An error has occured.');
+				error : function(jqXHR, textStatus, errorThrown) {
+					debug.error('An error has occured [textStatus:'+textStatus+'][errorThrown:'+errorThrown+'.');
+					alert('The remote server returned an error: '+errorThrown);
+					stanbol._eventSource.trigger('loaded');
 				},
 				url : $.ioio.ikswp.settings.proxy,
 				data : {
@@ -189,6 +191,7 @@
 	 * Entity
 	 */
 	$.ioio.ikswp.entities.entity = function(entity, type) {
+		debug.debug('creating a new entity of type ['+type+']');
 		return new $.ioio.ikswp.entities.entity.fn.init(entity, type);
 	};
 	$.ioio.ikswp.entities.entity.fn = $.ioio.ikswp.entities.entity.prototype = {
