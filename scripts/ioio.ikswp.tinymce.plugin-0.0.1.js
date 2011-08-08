@@ -28,7 +28,7 @@ tinymce
 								.addButton(
 										'io_semantic_lift_button',
 										{
-											title : 'Semantic Lift',
+											title : 'WordLift: Microdata Tagging of People and Organization',
 											image : '../wp-content/plugins/wordlift/images/kubrick.jpg',
 											// icons : false,
 											onclick : function() {
