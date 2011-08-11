@@ -67,7 +67,7 @@ register_uninstall_hook(__FILE__, 'wlp_uninstall');
 
 // activating the default values
 function wlp_activate() {
-	add_option('wlp_stanbol_engines_url', 'http://localhost:8080/engines/');
+	add_option('wlp_stanbol_engines_url', 'http://stanbol.insideout.io/engines/');
 }
 
 // deactivating
