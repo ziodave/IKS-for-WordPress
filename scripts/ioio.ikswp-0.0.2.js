@@ -21,8 +21,8 @@
 	 */
 	$.ioio.ikswp.settings = {
 		proxy : '../wp-content/plugins/wordlift/utils/proxy/proxy.php',
-		stanbol : 'http://10.181.173.101/engines/',
-		entityhub : 'http://10.181.173.101/entityhub/sites/entity?id='
+		stanbol : 'http://stanbol.insideout.io/engines/',
+		entityhub : 'http://stanbol.insideout.io/entityhub/sites/entity?id='
 	}
 
 	/**
@@ -99,55 +99,64 @@
 		analyze : function(content) {
 			this._eventSource.trigger('loading');
 			var stanbol = this;
-			$.ajax({
-				timeout: 300000,
-				async : true,
-				type : "POST",
-				success : function(data) {
-					debug.group('$.ioio.ikswp.stanbol.analyze');
+			$
+					.ajax({
+						timeout : 300000,
+						async : true,
+						type : "POST",
+						success : function(data) {
+							debug.group('$.ioio.ikswp.stanbol.analyze');
 
-					var rdf = $.ioio.ikswp.namespaces.applyToRdf($.rdf().load(
-							data));
+							var rdf = $.ioio.ikswp.namespaces.applyToRdf($
+									.rdf().load(data));
 
-					// create the entities and their renderers
-					var types = [ 'Person', 'Organization', 'Place' ];
-					for ( var t in types) {
-						debug.debug('type: ' + types[t]);
-						rdf.where('?entity a google:' + types[t]).each(
-								function() {
-									$.ioio.ikswp.renderers.renderer(
-											stanbol._resultElement,
-											new $.ioio.ikswp.entities.entity(
-													stanbol.fragment(rdf,
-															this.entity.value),
-													types[t]));
-								});
-					}
+							// create the entities and their renderers
+							var types = [ 'Person', 'Organization', 'Place' ];
+							for ( var t in types) {
+								debug.debug('type: ' + types[t]);
+								rdf
+										.where('?entity a google:' + types[t])
+										.each(
+												function() {
+													$.ioio.ikswp.renderers
+															.renderer(
+																	stanbol._resultElement,
+																	new $.ioio.ikswp.entities.entity(
+																			stanbol
+																					.fragment(
+																							rdf,
+																							this.entity.value),
+																			types[t]));
+												});
+							}
 
-					stanbol._eventSource.trigger('loaded');
+							stanbol._eventSource.trigger('loaded');
 
-					debug.groupEnd();
+							debug.groupEnd();
 
-				},
-				error : function(jqXHR, textStatus, errorThrown) {
-					debug.error('An error has occured [textStatus:'+textStatus+'][errorThrown:'+errorThrown+'.');
-					alert('The remote server returned an error: '+errorThrown);
-					stanbol._eventSource.trigger('loaded');
-				},
-				url : $.ioio.ikswp.settings.proxy,
-				data : {
-					proxy_url : $.ioio.ikswp.settings.stanbol,
-					/*
-					 * the following option is available:
-					 * "http://localhost:8080/engines/",
-					 * http://localhost:10088/enel/rdfa/sample_stanbol.rdf
-					 * "http://localhost:10088/enel/rdfa/sample_stanbol.002.rdf"
-					 */
-					content : content,
-					verb : "POST",
-					format : "application/rdf+xml"
-				}
-			});
+						},
+						error : function(jqXHR, textStatus, errorThrown) {
+							debug.error('An error has occured [textStatus:'
+									+ textStatus + '][errorThrown:'
+									+ errorThrown + '.');
+							alert('The remote server returned an error: '
+									+ errorThrown);
+							stanbol._eventSource.trigger('loaded');
+						},
+						url : $.ioio.ikswp.settings.proxy,
+						data : {
+							proxy_url : $.ioio.ikswp.settings.stanbol,
+							/*
+							 * the following option is available:
+							 * "http://localhost:8080/engines/",
+							 * http://localhost:10088/enel/rdfa/sample_stanbol.rdf
+							 * "http://localhost:10088/enel/rdfa/sample_stanbol.002.rdf"
+							 */
+							content : content,
+							verb : "POST",
+							format : "application/rdf+xml"
+						}
+					});
 		},
 		bind : function(event, callback) {
 			this._eventSource.bind(event, callback);
@@ -191,7 +200,7 @@
 	 * Entity
 	 */
 	$.ioio.ikswp.entities.entity = function(entity, type) {
-		debug.debug('creating a new entity of type ['+type+']');
+		debug.debug('creating a new entity of type [' + type + ']');
 		return new $.ioio.ikswp.entities.entity.fn.init(entity, type);
 	};
 	$.ioio.ikswp.entities.entity.fn = $.ioio.ikswp.entities.entity.prototype = {
@@ -207,7 +216,8 @@
 
 			this._entity = entity;
 			this._type = type;
-			this._model = ( $.ioio.ikswp.entities.models[this._type] ? $.ioio.ikswp.entities.models[this._type] : $.ioio.ikswp.entities.models['Unknown'] );
+			this._model = ($.ioio.ikswp.entities.models[this._type] ? $.ioio.ikswp.entities.models[this._type]
+					: $.ioio.ikswp.entities.models['Unknown']);
 
 			debug.debug('model: ' + this._model);
 
@@ -254,7 +264,8 @@
 		render : function(element) {
 			element.empty();
 
-			var itemscope = $('<div itemscope itemtype="http://data-vocabulary.org/'+this._entity._type+'"></div>');
+			var itemscope = $('<div itemscope itemtype="http://data-vocabulary.org/'
+					+ this._entity._type + '"></div>');
 
 			if (this._entity.photos.valueAt(0) !== undefined) {
 				itemscope.append('<img itemprop="photo" class="photo" src="'
@@ -263,21 +274,20 @@
 			if (this._entity.names !== undefined) {
 				var names = $('<div class="name"></div>').appendTo(itemscope);
 				$.each(this._entity.names._property, function() {
-					names.append('<div itemprop="name">'
-							+ this.value + '</div>');
+					names.append('<div itemprop="name">' + this.value
+							+ '</div>');
 				});
 
 			}
 			if (this._entity.affiliations !== undefined) {
 				itemscope
 						.append('<div itemprop="affiliation" class="affiliation">'
-								+ this._entity.affiliations
-										.join(' and ') + '</div>');
+								+ this._entity.affiliations.join(' and ')
+								+ '</div>');
 			}
 			if (this._entity.roles !== undefined) {
 				itemscope.append('<div itemprop="role" class="roles">'
-						+ this._entity.roles.join('<br/>')
-						+ '</div>');
+						+ this._entity.roles.join('<br/>') + '</div>');
 			}
 			if (this._entity.urls !== undefined) {
 				var urls = $('<div class="url"></div>').appendTo(itemscope);
@@ -292,19 +302,6 @@
 		}
 	};
 	$.ioio.ikswp.renderers.renderer.fn.init.prototype = $.ioio.ikswp.renderers.renderer.prototype;
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-
 
 	/**
 	 * Creates a new dualRendererAdapter which renders either the base
