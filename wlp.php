@@ -2,12 +2,12 @@
 
 /*
  Plugin Name: WordLift
- Plugin URI: wordlift
- Description: WordLift
- Version: 0.1
- Author: John Smith
- Author URI: johnsmith
- License: GPL2
+ Plugin URI: http://www.linkedin.com/company/insideout10/wordlift-327348/product
+ Description: WordLift is a WordPress Plug-In to enrich any user-created text (a blog post, article or web page) with HTML microdata to improve content findability. WordLift "reads" the text, "understands" all contextual content and enriches the original text by adding the most relevant information from the semantic web. All the information retrieved can be manually edited by the author and it is used to mark-up the page in a way all major search providers (Google, Bing and Yahoo!) recognized. Through a simple Plug-In all your contents will be instantly compliant with schema.org specifications for a better SEO.
+ Version: 1.0
+ Author: InsideOut10
+ Author URI: http://www.linkedin.com/company/insideout10
+ License: APL
  */
 
 /*  Copyright 2011 [author], [company], [company_url]
@@ -87,6 +87,7 @@ function wlp_uninstall() {
 
 function wlp_create_menu() {
 
+	/*
 	// create new top-level menu
 	add_menu_page(
 	__('Plugin Name', EMU2_I18N_DOMAIN), __('Plugin Name', EMU2_I18N_DOMAIN), 0, WLP_PLUGIN_DIRECTORY . '/wlp_settings_page.php', '', plugins_url('/images/icon.png', __FILE__));
@@ -95,6 +96,7 @@ function wlp_create_menu() {
 	add_submenu_page(
 	WLP_PLUGIN_DIRECTORY . '/wlp_settings_page.php', __("Plugin Name", EMU2_I18N_DOMAIN), __("Settings", EMU2_I18N_DOMAIN), 0, WLP_PLUGIN_DIRECTORY . '/wlp_settings_page.php'
 	);
+	*/
 }
 
 function my_plugin_admin_styles() {
