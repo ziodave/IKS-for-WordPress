@@ -39,7 +39,7 @@ define('WLP_DEBUG', false);  # never use debug mode on productive systems
 define('EMU2_I18N_DOMAIN', 'wlp');
 
 // how to handle log files, don't load them if you don't log
-require_once('wlp_logfilehandling.php');
+// require_once('wlp_logfilehandling.php');
 
 // contains the init action
 require_once( 'wlp_init.php' );
